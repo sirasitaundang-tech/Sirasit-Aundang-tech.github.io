@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Benefit Calculator – Internal Use</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+  margin: 0;
+}
+
+/* ===== Main Card ===== */
+.box {
+  max-width: 520px;
+  background: #ffffff;
+  margin: 24px auto;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ===== Header Image (Offshore) ===== */
+.header {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.header img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.header-text {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  background: rgba(0, 60, 120, 0.78);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.header-text h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.header-text p {
+  margin: 2px 0 0;
+  color: #e0e0e0;
+  font-size: 12px;
+}
+
+/* ===== Table ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #dcdcdc;
+  padding: 6px;
+  text-align: center;
+}
+
+th {
+  background: #0054a6;
+  color: #ffffff;
+}
+
+select, input {
+  width: 100%;
+  padding: 4px;
+  font-size: 14px;
+}
+
+/* ===== Buttons ===== */
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #0054a6;
+  color: white;
+  border: none;
+  font-size: 15px;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #003f82;
+  cursor: pointer;
+}
+
+/* ===== Total ===== */
+.total {
+  margin-top: 15px;
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+/* ===== Footer ===== */
+.footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: #777;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <!-- ===== Header ===== -->
+  <div class="header">
+    <img src="logo.jpg" alt="Offshore Platform">
+    <div class="header-text">
+      <h2>Benefit Calculator</h2>
+      <p>Operational Cost Saving Estimation</p>
+    </div>
+  </div>
+
+  <!-- ===== Table ===== -->
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Hours</th>
+        <th>Rate</th>
+        <th>Price ($)</th>
+        <th>Save Cost ($)</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <button onclick="addRow()">➕ Add Item</button>
+  <button onclick="calculate()">📊 Calculate Total</button>
+
+  <div class="total" id="total"></div>
+
+  <div class="footer">
+    © Chevron – Internal Use Only<br>
+    This tool is for operational estimation purposes only.
+  </div>
+
+</div>
+
+<script>
+function addRow() {
+  let tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>
+      <select onchange="autoFill(this)">
+        <option value="">Select</option>
+        <option value="gas_pacpp">Gas PACPP</option>
+        <option value="condy">CONDY PACPP</option>
+        <option value="remote">Gas Remote Platform</option>
+      </select>
+    </td>
+    <td><input type="number" value="1" min="0"></td>
+    <td><input type="number" step="0.01" min="0"></td>
+    <td><input type="number" min="0"></td>
+    <td class="cost">0</td>
+  `;
+  document.getElementById("rows").appendChild(tr);
+}
+
+function autoFill(select) {
+  let row = select.closest("tr");
+  let hours = row.children[1].children[0];
+  let rate = row.children[2].children[0];
+  let price = row.children[3].children[0];
+
+  if (select.value === "gas_pacpp") {
+    hours.value = 1;
+    rate.value = 9.17;
+    price.value = 6000;
+  }
+
+  if (select.value === "condy") {
+    hours.value = 1;
+    rate.value = 396;
+    price.value = 60;
+  }
+
+  if (select.value === "remote") {
+    hours.value = 5;
+    rate.value = 0.21;
+    price.value = 6000;
+  }
+}
+
+function calculate() {
+  let total = 0;
+
+  document.querySelectorAll("#rows tr").forEach(row => {
+    let h = Number(row.children[1].children[0].value || 0);
+    let r = Number(row.children[2].children[0].value || 0);
+    let p = Number(row.children[3].children[0].value || 0);
+
+    let cost = h * r * p;
+    row.querySelector(".cost").innerText = cost.toLocaleString();
+    total += cost;
+  });
+
+  document.getElementById("total").innerText =
+    "TOTAL SAVE COST = $" + total.toLocaleString();
+}
+
+addRow();
+</script>
+
+</body>
+</html>
